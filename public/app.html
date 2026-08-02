@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CORTEX App — Agentic Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/cortex.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='6' fill='%233ee6ff'/><circle cx='16' cy='16' r='13' fill='none' stroke='%232e7cff' stroke-width='2' stroke-dasharray='6 4'/></svg>">
+<style>
+.appwrap{max-width:1240px;margin:0 auto;padding:24px;display:grid;gap:18px;grid-template-columns:1fr 380px;position:relative;z-index:1}
+@media(max-width:960px){.appwrap{grid-template-columns:1fr}}
+.panel{background:linear-gradient(180deg,rgba(15,22,40,.92),rgba(9,13,23,.92));border:1px solid var(--line);border-radius:16px;padding:20px}
+.panel h3{font-size:13px;font-family:var(--mono);letter-spacing:.2em;color:var(--cyan);margin-bottom:14px;text-transform:uppercase}
+.total{font-size:38px;font-weight:800;letter-spacing:-.02em}
+.total small{font-size:14px;color:var(--dim);font-weight:600;display:block;margin-top:2px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;color:var(--dim);text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:9px 6px;border-bottom:1px solid rgba(26,36,64,.5)}
+td.r,th.r{text-align:right;font-family:var(--mono)}
+.sym{font-weight:700}
+/* chat */
+.chat{display:flex;flex-direction:column;height:560px}
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:4px;font-size:13.5px}
+.m{max-width:92%;padding:10px 14px;border-radius:12px;white-space:pre-wrap}
+.m.user{align-self:flex-end;background:linear-gradient(135deg,var(--blue),#1a4fd6);color:#fff}
+.m.bot{align-self:flex-start;background:#0d1526;border:1px solid var(--line)}
+.m.plan{align-self:flex-start;background:#0a1424;border:1px solid rgba(62,230,255,.4);width:92%}
+.m.plan .pt{font-weight:800;color:var(--cyan);margin-bottom:6px}
+.m.plan ol{margin:6px 0 8px 18px;color:var(--dim)}
+.m.plan .why{font-size:12.5px;color:var(--dim)}
+.m .exec{margin-top:10px;display:flex;gap:8px}
+.m .exec button{font-family:var(--sans);font-weight:700;font-size:12.5px;padding:8px 16px;border-radius:8px;cursor:pointer;border:1px solid var(--blue);background:linear-gradient(135deg,var(--blue),#1a4fd6);color:#fff}
+.m .exec button.no{background:transparent;border-color:var(--line);color:var(--dim)}
+.m .exec button:disabled{opacity:.4;cursor:default}
+.inrow{display:flex;gap:8px;margin-top:12px}
+.inrow input{flex:1;background:#070b14;border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:12px 14px;font-family:var(--mono);font-size:13px;outline:none}
+.inrow input:focus{border-color:var(--cyan)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{font-family:var(--mono);font-size:10.5px;color:var(--dim);border:1px solid var(--line);border-radius:99px;padding:4px 10px;cursor:pointer}
+.chip:hover{color:var(--cyan);border-color:var(--cyan)}
+.tape{font-family:var(--mono);font-size:11.5px;max-height:260px;overflow-y:auto}
+.tape .row{padding:6px 0;border-bottom:1px solid rgba(26,36,64,.5);color:var(--dim)}
+.tape .k{color:var(--cyan);margin-right:8px}
+.stat{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--dim)}
+.stat b{color:var(--ink);font-family:var(--mono)}
+.good{color:var(--good)}.bad{color:var(--bad)}
+</style>
+</head>
+<body>
+<canvas class="synapse" id="syn"></canvas>
+<header>
+  <div class="nav">
+    <a class="logo" href="/"><svg width="24" height="24" viewBox="0 0 32 32"><circle cx="16" cy="16" r="5.5" fill="#3ee6ff"/><circle cx="16" cy="16" r="13" fill="none" stroke="#2e7cff" stroke-width="2" stroke-dasharray="6 4"/></svg> CORTEX <span style="font-size:11px;color:var(--dim);font-family:var(--mono);letter-spacing:.2em;margin-left:6px">APP</span></a>
+    <div class="links">
+      <a href="/docs">Docs</a>
+      <span id="acctid" style="font-family:var(--mono);font-size:11px;color:var(--dim)"></span>
+    </div>
+  </div>
+</header>
+
+<div class="appwrap">
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div class="panel">
+      <h3>Portfolio</h3>
+      <div class="total" id="total">$—<small>marked to live Pyth oracle · paper account</small></div>
+      <table style="margin-top:14px">
+        <thead><tr><th>ASSET</th><th class="r">BALANCE</th><th class="r">PRICE</th><th class="r">VALUE</th><th class="r">ALLOC</th></tr></thead>
+        <tbody id="ptable"></tbody>
+      </table>
+    </div>
+    <div class="panel chat">
+      <h3>Agent Console</h3>
+      <div class="msgs" id="msgs"></div>
+      <div class="inrow">
+        <input id="inp" placeholder='define intent… e.g. "swap 500 USDC to SOL"' autocomplete="off">
+        <button class="btn" id="send" style="padding:10px 20px">Send</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div class="panel">
+      <h3>Earn</h3>
+      <div class="stat"><span>$CRTX staked</span><b id="staked">—</b></div>
+      <div class="stat"><span>Rewards accrued</span><b id="rewards" class="good">—</b></div>
+      <div class="stat"><span>APY</span><b>12.00%</b></div>
+    </div>
+    <div class="panel">
+      <h3>Spend</h3>
+      <div class="stat"><span>Card rail</span><b class="good">ACTIVE</b></div>
+      <div class="stat"><span>Cashback rate</span><b>2% → $CRTX</b></div>
+      <div class="stat"><span>Lifetime cashback</span><b id="cashback">—</b></div>
+    </div>
+    <div class="panel">
+      <h3>Alerts</h3>
+      <div class="tape" id="alerts"><div class="row">No alerts armed.</div></div>
+    </div>
+    <div class="panel">
+      <h3>Account Tape</h3>
+      <div class="tape" id="tape"></div>
+    </div>
+  </div>
+</div>
+
+<footer><p class="disc">Paper account — simulated balances, no custody, no real funds. Not financial advice.</p></footer>
+
+<script>
+// synapse bg (lighter)
+const cv=document.getElementById('syn'),cx=cv.getContext('2d');let W,H,nodes=[];
+function rs(){W=cv.width=innerWidth;H=cv.height=innerHeight;nodes=Array.from({length:40},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3}))}
+rs();addEventListener('resize',rs);
+setInterval(()=>{cx.clearRect(0,0,W,H);for(const n of nodes){n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;cx.fillStyle='rgba(62,230,255,.35)';cx.beginPath();cx.arc(n.x,n.y,1.4,0,7);cx.fill()}},50);
+
+// account id
+let ID=localStorage.getItem('crtx_id');
+if(!ID){ID='u_'+Array.from(crypto.getRandomValues(new Uint8Array(12)),b=>'abcdefghijklmnopqrstuvwxyz0123456789'[b%36]).join('');localStorage.setItem('crtx_id',ID)}
+document.getElementById('acctid').textContent=ID.slice(0,14)+'…';
+
+const f=n=>n>=1000?n.toLocaleString('en-US',{maximumFractionDigits:0}):n>=1?n.toFixed(2):(n>0?n.toPrecision(4):'0');
+let PRICES={};
+
+async function refresh(){
+  try{
+    const [pr,st]=await Promise.all([fetch('/api/prices').then(r=>r.json()),fetch('/api/state?id='+ID).then(r=>r.json())]);
+    PRICES=pr;
+    document.getElementById('total').innerHTML='$'+f(st.total)+'<small>marked to live Pyth oracle · paper account</small>';
+    const rows=[];
+    for(const sym of ['USDC','SOL','ETH','BTC','CRTX']){
+      const amt=st.bal[sym]||0,px=pr[sym]?pr[sym].px:0,v=amt*px;
+      rows.push(`<tr><td class="sym">${sym==='CRTX'?'$CRTX':sym}</td><td class="r">${f(amt)}</td><td class="r">$${f(px)}</td><td class="r">$${f(v)}</td><td class="r">${st.total?(v/st.total*100).toFixed(1):'0'}%</td></tr>`);
+    }
+    document.getElementById('ptable').innerHTML=rows.join('');
+    document.getElementById('staked').textContent=f(st.staked);
+    document.getElementById('rewards').textContent='+'+f(st.rewards);
+    document.getElementById('cashback').textContent=f(st.cashback)+' $CRTX';
+    document.getElementById('alerts').innerHTML=(st.alerts&&st.alerts.length)?st.alerts.slice().reverse().map(a=>`<div class="row"><span class="k">${a.fired?'✔ FIRED':'● ARMED'}</span>${a.sym} ${a.op} $${f(a.level)}${a.fired?' @ $'+f(a.firedPx):''}</div>`).join(''):'<div class="row">No alerts armed.</div>';
+    document.getElementById('tape').innerHTML=(st.tape||[]).map(r=>`<div class="row"><span class="k">${r.kind}</span>${r.msg}</div>`).join('');
+  }catch(e){}
+}
+refresh();setInterval(refresh,5000);
+
+// chat
+const msgs=document.getElementById('msgs'),inp=document.getElementById('inp');
+function add(html,cls){const d=document.createElement('div');d.className='m '+cls;d.innerHTML=html;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d}
+add('Neural link established. I structure your intent into validated plans, then execute on your confirm.\nTry: <b>"analyze my portfolio"</b> or <b>"swap 500 USDC to SOL"</b>','bot');
+
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function send(){
+  const text=inp.value.trim();if(!text)return;inp.value='';
+  add(esc(text),'user');
+  try{
+    const r=await fetch('/api/agent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:ID,text})});
+    const j=await r.json();
+    if(j.kind==='reply'){add(j.lines.map(esc).join('\n'),'bot')}
+    else if(j.kind==='plan'){
+      const p=j.plan;
+      const d=add(`<div class="pt">⚡ PLAN — ${esc(p.title)}</div><ol>${p.steps.map(s=>'<li>'+esc(s)+'</li>').join('')}</ol><div class="why">${esc(p.rationale||'')}</div><div class="exec"><button class="go">Execute →</button><button class="no">Dismiss</button></div>`,'plan');
+      const go=d.querySelector('.go'),no=d.querySelector('.no');
+      if(p.valid===false)go.disabled=true;
+      go.onclick=async()=>{go.disabled=true;no.disabled=true;
+        const er=await fetch('/api/execute',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:ID,plan:p})});
+        const ej=await er.json();
+        add((ej.ok?'✔ ':'✖ ')+esc(ej.msg||ej.err||'error'),'bot');
+        refresh();
+      };
+      no.onclick=()=>{go.disabled=true;no.disabled=true;add('Plan dismissed. Nothing moved.','bot')};
+    }
+  }catch(e){add('Connection error.','bot')}
+}
+document.getElementById('send').onclick=send;
+inp.addEventListener('keydown',e=>{if(e.key==='Enter')send()});
+
+// quick chips
+const CHIPS=['analyze my portfolio','swap 500 USDC to SOL','buy $250 of ETH','alert me when SOL > 200','stake 100k CRTX','spend $40 on dinner','price of BTC'];
+document.getElementById('chips').innerHTML=CHIPS.map(c=>`<span class="chip">${c}</span>`).join('');
+document.querySelectorAll('.chip').forEach(el=>el.onclick=()=>{inp.value=el.textContent;send()});
+</script>
+</body>
+</html>

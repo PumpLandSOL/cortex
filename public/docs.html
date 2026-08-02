@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CORTEX — Docs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/cortex.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='6' fill='%233ee6ff'/><circle cx='16' cy='16' r='13' fill='none' stroke='%232e7cff' stroke-width='2' stroke-dasharray='6 4'/></svg>">
+<style>
+.doc{max-width:780px;margin:0 auto;padding:60px 24px 100px;position:relative;z-index:1}
+.doc h1{font-size:40px;margin-bottom:8px}
+.doc h2{font-size:24px;margin:44px 0 12px;color:var(--cyan)}
+.doc p,.doc li{color:var(--dim);font-size:15px}
+.doc ul{margin:10px 0 10px 22px}
+.doc code{font-family:var(--mono);font-size:13px;background:#0d1526;border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--cyan)}
+.doc .box{background:#0a1424;border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:16px 0;font-size:14px;color:var(--dim)}
+</style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <a class="logo" href="/"><svg width="24" height="24" viewBox="0 0 32 32"><circle cx="16" cy="16" r="5.5" fill="#3ee6ff"/><circle cx="16" cy="16" r="13" fill="none" stroke="#2e7cff" stroke-width="2" stroke-dasharray="6 4"/></svg> CORTEX</a>
+    <div class="links"><a href="/app">App</a><a class="btn" href="/app">Enter App →</a></div>
+  </div>
+</header>
+<div class="doc">
+  <h1>Documentation</h1>
+  <p>How the CORTEX agentic financial engine works, end to end.</p>
+
+  <h2>1 · Intent → Plan → Execute</h2>
+  <p>Every interaction follows one loop:</p>
+  <ul>
+    <li><b>Intent</b> — you say what you want in plain language: <code>swap 500 USDC to SOL</code>, <code>alert me when SOL &gt; 200</code>, <code>spend $40 on dinner</code>.</li>
+    <li><b>Plan</b> — the agent structures it: route, fees, resulting amounts, and validation against your actual balances. Invalid plans can't be executed.</li>
+    <li><b>Execute</b> — one click confirms. The engine re-validates server-side at current oracle prices, settles, and mints a receipt into your account tape.</li>
+  </ul>
+  <div class="box">The agent never moves capital without your confirm. Read-only intents (analysis, quotes) execute instantly.</div>
+
+  <h2>2 · Invest — the integrated DEX</h2>
+  <p>Swaps route at live Pyth oracle mid-price across BTC, ETH, SOL, USDC, and $CRTX, with a flat 0.10% network fee. No order books to babysit, no app-switching — quotes, execution, and settlement in one surface.</p>
+
+  <h2>3 · Analyze</h2>
+  <p>Portfolio analysis marks every holding to the live oracle and flags concentration risk (&gt;60% in one asset), thin stable reserves (&lt;10% USDC), and idle capital. Price alerts watch the oracle continuously; the moment one fires it's logged to your tape and analysis is queued.</p>
+
+  <h2>4 · Earn</h2>
+  <p>Stake $CRTX into the earn vault at <b>12% APY</b>, accrued per second. No lockups — <code>unstake</code> returns principal plus rewards instantly.</p>
+
+  <h2>5 · Spend</h2>
+  <p>The card rail settles purchases from your USDC balance with a 0.1% network fee and credits <b>2% cashback in $CRTX</b> immediately. Real-world utility meets on-chain capital.</p>
+
+  <h2>6 · $CRTX</h2>
+  <p>$CRTX is the bloodstream of the system: the earn vault denominates in it, cashback pays in it, and fee routing accrues to it.</p>
+
+  <h2>7 · Honesty layer</h2>
+  <div class="box">CORTEX is a technology demonstration. All app balances are <b>simulated paper positions</b> — the engine holds no custody, moves no real funds, and issues no cards. Prices are real (Pyth oracle); execution is paper. Nothing on this site is financial advice. $CRTX is a memecoin with no expectation of profit from the efforts of others.</div>
+</div>
+<footer><div>CORTEX · $CRTX · One brain. All your money.</div></footer>
+</body>
+</html>
